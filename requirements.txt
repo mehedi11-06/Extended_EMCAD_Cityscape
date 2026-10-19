@@ -1,0 +1,13 @@
+# EMCAD-Cityscapes
+# Versions below are what this project was developed against; pin whatever you
+# actually ran (python -m tools.check_env writes the real values into results/).
+torch>=1.11
+torchvision
+timm>=0.4.12            # EMCAD lib/decoders.py imports trunc_normal_tf_, named_apply
+numpy
+pillow
+pyyaml
+matplotlib
+tqdm
+# optional, for the official-evaluation cross-check (needs internet):
+# cityscapesscripts

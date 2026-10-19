@@ -1,0 +1,53 @@
+# EMCAD on Cityscapes, 19 classes - CE-only ablation (identical except `loss`)
+#
+# Every value here is a STARTING POINT chosen to fit a bounded Kaggle GPU
+# session, not a tuned or published setting. Record whatever you actually ran.
+
+# --- data ---
+data_root: null                 # null -> auto-discover under /kaggle/input
+crop_size: [512, 1024]          # H W; both MUST be divisible by 32
+val_resize: [512, 1024]         # null -> evaluate at native 1024x2048
+scale_min: 0.5
+scale_max: 2.0
+
+# --- model (lib/ is the unmodified official EMCAD) ---
+encoder: pvt_v2_b2
+pretrained_dir: ./pretrained_pth/pvt/
+no_pretrain: false
+kernel_sizes: [1, 3, 5]
+expansion_factor: 2
+lgag_ks: 3
+activation_mscb: relu6
+no_dw_parallel: false
+concatenation: false
+
+# --- supervision & loss ---
+# mutation = EMCAD's default (15 loss terms); deep_supervision = 4; last_layer = 1.
+# Measure all three with tools/supervision_cost.py before committing.
+supervision: deep_supervision
+loss: ce                        # ce | ce_dice | ce_focal | ce_dice_focal
+w_ce: 0.3                       # EMCAD trainer.py:103 weighting
+w_dice: 0.7
+w_focal: 0.0
+focal_gamma: 2.0
+
+# --- optimization ---
+batch_size: 2
+grad_accum: 1                   # raise to simulate a larger batch under OOM
+lr: 0.00006                     # AdamW; EMCAD uses 1e-4 at 224x224 batch 6
+weight_decay: 0.01
+poly_power: 0.9
+warmup_iters: 500
+max_iters: 20000
+amp: true
+
+# --- schedule / IO ---
+val_interval: 2000
+log_interval: 50
+num_workers: 2
+out_dir: /kaggle/working/runs/emcad_cityscapes_ce_only
+max_hours: 10.5                 # checkpoint and stop before the session is killed
+seed: 1234
+deterministic: true
+train_limit: null
+val_limit: null

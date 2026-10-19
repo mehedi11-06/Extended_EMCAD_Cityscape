@@ -1,0 +1,5 @@
+{"iter": 50, "loss": 2.0573, "lr": 6e-05, "sec_per_iter": 13.0501, "peak_alloc_GB": 5.189, "elapsed_h": 0.181}
+{"iter": 100, "loss": 1.5067, "lr": 5.5167e-05, "sec_per_iter": 11.5933, "peak_alloc_GB": 5.189, "elapsed_h": 0.342}
+{"iter": 150, "loss": 1.2751, "lr": 5.0186e-05, "sec_per_iter": 11.5605, "peak_alloc_GB": 5.189, "elapsed_h": 0.503}
+{"iter": 50, "loss": 1.4522, "lr": 3.7887e-05, "sec_per_iter": 13.004, "peak_alloc_GB": 5.189, "elapsed_h": 0.181}
+{"event": "finished", "iter": 88, "hours": 0.303}

@@ -1,0 +1,37 @@
+{
+  "data_root": "/kaggle/working/cityscapes",
+  "encoder": "pvt_v2_b2",
+  "pretrained_dir": "./pretrained_pth/pvt/",
+  "no_pretrain": false,
+  "num_classes": 19,
+  "crop": [
+    512,
+    1024
+  ],
+  "scale": [
+    0.5,
+    1.25
+  ],
+  "batch_size": 4,
+  "accum": 1,
+  "iters": 100,
+  "lr": 6e-05,
+  "decoder_lr_mult": 10.0,
+  "weight_decay": 0.01,
+  "warmup": 15,
+  "supervision": "deep_supervision",
+  "aux_native": true,
+  "aux_weight": 0.4,
+  "focal": false,
+  "w_ce": 0.3,
+  "w_dice": 0.7,
+  "workers": 2,
+  "seed": 2222,
+  "out": "/kaggle/working/runs/b2_ds",
+  "resume": "auto",
+  "ckpt_every": 10,
+  "val_every": 0,
+  "val_images": 100,
+  "log_every": 50,
+  "max_hours": 0.3
+}

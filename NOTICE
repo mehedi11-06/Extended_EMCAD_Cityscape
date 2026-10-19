@@ -1,0 +1,31 @@
+This project builds on the official EMCAD implementation.
+
+    EMCAD: Efficient Multi-scale Convolutional Attention Decoding for
+    Medical Image Segmentation
+    Md Mostafijur Rahman, Mustafa Munir, Radu Marculescu
+    CVPR 2024 -- https://github.com/SLDGroup/EMCAD
+
+VENDORED UNMODIFIED from that repository:
+    lib/networks.py
+    lib/decoders.py
+    lib/pvtv2.py
+    lib/resnet.py
+
+Upstream commit: <fill from results/emcad_commit.txt>
+Verify with:     diff -r lib /tmp/EMCAD_ref/lib
+
+MODIFICATIONS to vendored files (list must be empty or exhaustive):
+    <none>  |  lib/networks.py:68 torch.load(..., weights_only=False)
+              -- compatibility with PyTorch >= 2.6, which changed the default.
+                 Loading behaviour only; the model is unchanged.
+
+DERIVED LOGIC, reimplemented in new files (each file names its source lines):
+    train_cityscapes.py              <- trainer.py, train_synapse.py
+    losses/segmentation_losses.py    <- utils/utils.py:19-28, 102-138; trainer.py:91-113
+    eval_cityscapes.py               <- utils/utils.py:239-274 (the P[-1] convention)
+    datasets/cityscapes.py           <- utils/dataset_synapse.py (contract only)
+
+Everything under configs/, datasets/, losses/, utils/, tests/, tools/,
+kaggle/, scripts/ and the three top-level scripts is new work for this project.
+
+The EMCAD license applies to the vendored files; see LICENSE.

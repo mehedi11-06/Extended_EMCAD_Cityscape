@@ -1,0 +1,355 @@
+{
+  "criterion": "distinct classes, then thin-class pixels",
+  "chosen": [
+    {
+      "index": 374,
+      "name": "munster_000048_000019",
+      "n_classes": 16,
+      "thin_pixels": 240635
+    },
+    {
+      "index": 104,
+      "name": "frankfurt_000001_019854",
+      "n_classes": 16,
+      "thin_pixels": 108557
+    },
+    {
+      "index": 420,
+      "name": "munster_000094_000019",
+      "n_classes": 16,
+      "thin_pixels": 102306
+    },
+    {
+      "index": 409,
+      "name": "munster_000083_000019",
+      "n_classes": 16,
+      "thin_pixels": 88108
+    },
+    {
+      "index": 406,
+      "name": "munster_000080_000019",
+      "n_classes": 16,
+      "thin_pixels": 85116
+    },
+    {
+      "index": 26,
+      "name": "frankfurt_000000_011810",
+      "n_classes": 16,
+      "thin_pixels": 84364
+    },
+    {
+      "index": 307,
+      "name": "lindau_000040_000019",
+      "n_classes": 3,
+      "thin_pixels": 9878
+    },
+    {
+      "index": 311,
+      "name": "lindau_000044_000019",
+      "n_classes": 3,
+      "thin_pixels": 0
+    }
+  ],
+  "full_ranking": [
+    {
+      "index": 374,
+      "name": "munster_000048_000019",
+      "n_classes": 16,
+      "thin_pixels": 240635
+    },
+    {
+      "index": 104,
+      "name": "frankfurt_000001_019854",
+      "n_classes": 16,
+      "thin_pixels": 108557
+    },
+    {
+      "index": 420,
+      "name": "munster_000094_000019",
+      "n_classes": 16,
+      "thin_pixels": 102306
+    },
+    {
+      "index": 409,
+      "name": "munster_000083_000019",
+      "n_classes": 16,
+      "thin_pixels": 88108
+    },
+    {
+      "index": 406,
+      "name": "munster_000080_000019",
+      "n_classes": 16,
+      "thin_pixels": 85116
+    },
+    {
+      "index": 26,
+      "name": "frankfurt_000000_011810",
+      "n_classes": 16,
+      "thin_pixels": 84364
+    },
+    {
+      "index": 159,
+      "name": "frankfurt_000001_044525",
+      "n_classes": 16,
+      "thin_pixels": 80787
+    },
+    {
+      "index": 147,
+      "name": "frankfurt_000001_040732",
+      "n_classes": 16,
+      "thin_pixels": 76756
+    },
+    {
+      "index": 22,
+      "name": "frankfurt_000000_010763",
+      "n_classes": 16,
+      "thin_pixels": 72911
+    },
+    {
+      "index": 451,
+      "name": "munster_000125_000019",
+      "n_classes": 16,
+      "thin_pixels": 29035
+    },
+    {
+      "index": 434,
+      "name": "munster_000108_000019",
+      "n_classes": 16,
+      "thin_pixels": 20283
+    },
+    {
+      "index": 38,
+      "name": "frankfurt_000000_016286",
+      "n_classes": 15,
+      "thin_pixels": 241231
+    },
+    {
+      "index": 253,
+      "name": "frankfurt_000001_076502",
+      "n_classes": 15,
+      "thin_pixels": 195577
+    },
+    {
+      "index": 234,
+      "name": "frankfurt_000001_067295",
+      "n_classes": 15,
+      "thin_pixels": 153128
+    },
+    {
+      "index": 146,
+      "name": "frankfurt_000001_040575",
+      "n_classes": 15,
+      "thin_pixels": 147598
+    },
+    {
+      "index": 101,
+      "name": "frankfurt_000001_017842",
+      "n_classes": 15,
+      "thin_pixels": 145721
+    },
+    {
+      "index": 53,
+      "name": "frankfurt_000001_002646",
+      "n_classes": 15,
+      "thin_pixels": 138761
+    },
+    {
+      "index": 262,
+      "name": "frankfurt_000001_082087",
+      "n_classes": 15,
+      "thin_pixels": 124942
+    },
+    {
+      "index": 18,
+      "name": "frankfurt_000000_009561",
+      "n_classes": 15,
+      "thin_pixels": 124633
+    },
+    {
+      "index": 373,
+      "name": "munster_000047_000019",
+      "n_classes": 15,
+      "thin_pixels": 124361
+    },
+    {
+      "index": 486,
+      "name": "munster_000160_000019",
+      "n_classes": 15,
+      "thin_pixels": 96955
+    },
+    {
+      "index": 108,
+      "name": "frankfurt_000001_020693",
+      "n_classes": 15,
+      "thin_pixels": 91492
+    },
+    {
+      "index": 258,
+      "name": "frankfurt_000001_079206",
+      "n_classes": 15,
+      "thin_pixels": 86771
+    },
+    {
+      "index": 12,
+      "name": "frankfurt_000000_005898",
+      "n_classes": 15,
+      "thin_pixels": 84534
+    },
+    {
+      "index": 102,
+      "name": "frankfurt_000001_018113",
+      "n_classes": 15,
+      "thin_pixels": 81090
+    },
+    {
+      "index": 210,
+      "name": "frankfurt_000001_060906",
+      "n_classes": 15,
+      "thin_pixels": 76166
+    },
+    {
+      "index": 28,
+      "name": "frankfurt_000000_012121",
+      "n_classes": 15,
+      "thin_pixels": 75457
+    },
+    {
+      "index": 377,
+      "name": "munster_000051_000019",
+      "n_classes": 15,
+      "thin_pixels": 74936
+    },
+    {
+      "index": 160,
+      "name": "frankfurt_000001_044658",
+      "n_classes": 15,
+      "thin_pixels": 72652
+    },
+    {
+      "index": 265,
+      "name": "frankfurt_000001_083199",
+      "n_classes": 15,
+      "thin_pixels": 71727
+    },
+    {
+      "index": 162,
+      "name": "frankfurt_000001_046126",
+      "n_classes": 15,
+      "thin_pixels": 65754
+    },
+    {
+      "index": 396,
+      "name": "munster_000070_000019",
+      "n_classes": 15,
+      "thin_pixels": 64746
+    },
+    {
+      "index": 398,
+      "name": "munster_000072_000019",
+      "n_classes": 15,
+      "thin_pixels": 61813
+    },
+    {
+      "index": 152,
+      "name": "frankfurt_000001_042098",
+      "n_classes": 15,
+      "thin_pixels": 61286
+    },
+    {
+      "index": 211,
+      "name": "frankfurt_000001_061682",
+      "n_classes": 15,
+      "thin_pixels": 56724
+    },
+    {
+      "index": 58,
+      "name": "frankfurt_000001_004736",
+      "n_classes": 15,
+      "thin_pixels": 51838
+    },
+    {
+      "index": 353,
+      "name": "munster_000027_000019",
+      "n_classes": 15,
+      "thin_pixels": 50273
+    },
+    {
+      "index": 416,
+      "name": "munster_000090_000019",
+      "n_classes": 15,
+      "thin_pixels": 43949
+    },
+    {
+      "index": 209,
+      "name": "frankfurt_000001_060545",
+      "n_classes": 15,
+      "thin_pixels": 42788
+    },
+    {
+      "index": 91,
+      "name": "frankfurt_000001_014565",
+      "n_classes": 15,
+      "thin_pixels": 40335
+    },
+    {
+      "index": 261,
+      "name": "frankfurt_000001_080830",
+      "n_classes": 15,
+      "thin_pixels": 35801
+    },
+    {
+      "index": 348,
+      "name": "munster_000022_000019",
+      "n_classes": 15,
+      "thin_pixels": 35146
+    },
+    {
+      "index": 252,
+      "name": "frankfurt_000001_075984",
+      "n_classes": 15,
+      "thin_pixels": 29132
+    },
+    {
+      "index": 240,
+      "name": "frankfurt_000001_068772",
+      "n_classes": 15,
+      "thin_pixels": 27102
+    },
+    {
+      "index": 497,
+      "name": "munster_000171_000019",
+      "n_classes": 15,
+      "thin_pixels": 15019
+    },
+    {
+      "index": 454,
+      "name": "munster_000128_000019",
+      "n_classes": 15,
+      "thin_pixels": 10790
+    },
+    {
+      "index": 175,
+      "name": "frankfurt_000001_049770",
+      "n_classes": 14,
+      "thin_pixels": 399409
+    },
+    {
+      "index": 100,
+      "name": "frankfurt_000001_017459",
+      "n_classes": 14,
+      "thin_pixels": 279760
+    },
+    {
+      "index": 140,
+      "name": "frankfurt_000001_037705",
+      "n_classes": 14,
+      "thin_pixels": 263502
+    },
+    {
+      "index": 366,
+      "name": "munster_000040_000019",
+      "n_classes": 14,
+      "thin_pixels": 246889
+    }
+  ]
+}

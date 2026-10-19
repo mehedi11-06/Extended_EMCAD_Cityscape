@@ -1,0 +1,82 @@
+{
+  "gpu": "Tesla T4",
+  "n_gpus_visible": 2,
+  "torch": "2.11.0+cu128",
+  "cuda": "12.8",
+  "encoder": "pvt_v2_b2",
+  "params_M": {
+    "encoder": 24.8499,
+    "decoder": 1.9135,
+    "heads": 0.0195,
+    "total": 26.7829
+  },
+  "train": [
+    {
+      "batch": 2,
+      "resolution": "512x1024",
+      "amp": true,
+      "supervision": "deep_supervision",
+      "aux_native": true,
+      "step_time_median_s": 0.2842,
+      "step_time_p90_s": 0.2854,
+      "images_per_s": 7.04,
+      "peak_alloc_GB": 4.693,
+      "peak_reserved_GB": 5.025
+    },
+    {
+      "batch": 2,
+      "resolution": "512x1024",
+      "amp": true,
+      "supervision": "deep_supervision",
+      "aux_native": false,
+      "step_time_median_s": 0.458,
+      "step_time_p90_s": 0.4597,
+      "images_per_s": 4.37,
+      "peak_alloc_GB": 5.805,
+      "peak_reserved_GB": 6.064
+    },
+    {
+      "batch": 2,
+      "resolution": "512x1024",
+      "amp": true,
+      "supervision": "mutation",
+      "aux_native": false,
+      "step_time_median_s": 0.852,
+      "step_time_p90_s": 0.853,
+      "images_per_s": 2.35,
+      "peak_alloc_GB": 9.187,
+      "peak_reserved_GB": 9.33
+    },
+    {
+      "batch": 2,
+      "resolution": "512x1024",
+      "amp": true,
+      "supervision": "last_layer",
+      "aux_native": false,
+      "step_time_median_s": 0.2958,
+      "step_time_p90_s": 0.297,
+      "images_per_s": 6.76,
+      "peak_alloc_GB": 4.908,
+      "peak_reserved_GB": 9.33
+    }
+  ],
+  "inference": [
+    {
+      "resolution": "1024x2048",
+      "amp": true,
+      "latency_median_s": 0.5266,
+      "fps": 1.9,
+      "peak_alloc_GB": 1.843
+    },
+    {
+      "resolution": "512x1024",
+      "amp": true,
+      "latency_median_s": 0.0565,
+      "fps": 17.7,
+      "peak_alloc_GB": 0.462
+    }
+  ],
+  "note": "train numbers are single-GPU, compute only, no dataloader",
+  "gmacs_1024x2048": null,
+  "flop_counter_error": "CUDA out of memory. Tried to allocate 20.00 MiB. GPU 0 has a total capacity of 14.56 GiB of which 20.81 MiB is free. Including non-PyTorch memory, this process has 14.54 GiB memory in use. Of the allocated memory 14.20 GiB is allocated by PyTorch, and 133.07 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://docs.pytorch.org/docs/stable/notes/cuda.html#optimizing-memory-usage-with-pytorch-cuda-alloc-conf)"
+}
