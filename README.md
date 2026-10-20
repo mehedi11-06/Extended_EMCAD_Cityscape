@@ -8,23 +8,37 @@ Cityscapes, with a reproducible training/evaluation pipeline, efficiency
 profiling, and a failure analysis focused on small and thin classes.
 
 The EMCAD architecture in `lib/` is **vendored unmodified** from
-SLDGroup/EMCAD @ `<commit hash — results/emcad_commit.txt>`. Verify:
+SLDGroup/EMCAD @ `26c9c31f731f749b62c5fe83f44376dac75f3aa8`. Verify:
 
 ```bash
 git clone --depth 1 https://github.com/SLDGroup/EMCAD.git /tmp/EMCAD_ref
-diff -r lib /tmp/EMCAD_ref/lib        # expect no output
+diff -r --strip-trailing-cr lib /tmp/EMCAD_ref/lib    # expect no output
 ```
 
-> **Status:** `<fill in: all numbers below come from results/ — replace every
-> <placeholder> before submitting>`
+`--strip-trailing-cr` is needed because upstream's `lib/networks.py` is
+committed with CRLF line endings; the file contents are byte-identical
+otherwise.
+
 
 ---
 
 ## 1. Objective
 
+<<<<<<< HEAD
 `Adapt EMCAD to 19-class Cityscapes, train, evaluate on val,
 report per-class IoU / mIoU / peak memory / step time, and analyse failure
 modes on thin classes.>`
+=======
+EMCAD was published for binary medical image segmentation. This work takes
+the decoder unchanged and asks what it does on 19-class urban scenes, where
+the classes of interest are often a few pixels wide. The pipeline here trains
+a PVTv2-B2 encoder with the EMCAD decoder on Cityscapes `train`, evaluates on
+the 500-image `val` split at native 1024×2048 with a single confusion matrix
+over the whole split, and reports per-class IoU, mIoU, peak GPU memory and
+training step time alongside a failure analysis of the thin classes —
+boundary-band accuracy, per-instance recall against object size, and the
+contribution of each of the four decoder heads.
+>>>>>>> 4b1b5c7 (updated results on full 10500 iterations)
 
 ## 2. Architecture adaptation
 
@@ -58,14 +72,31 @@ evaluation, profiling and visualization. See `MANUAL.md` §5.
 
 ## 3. Cityscapes label handling
 
-- Masks read from `*_gtFine_labelTrainIds.png`; source used in this run:
-  `<official | generated with tools/make_train_ids.py>`.
-- 19 trainIds (0–18); every other label is **255** and contributes to neither
-  loss nor IoU.
-- The labelId→trainId table (`utils/cityscapes_labels.py`) cross-checks itself
-  against `cityscapesscripts` when installed and refuses to run on disagreement.
-- Masks use nearest-neighbour interpolation everywhere; images use bilinear.
-  Crop padding uses 255 for masks.
+- Masks are read from `*_gtFine_labelTrainIds.png` when present and from
+  `*_gtFine_labelIds.png` otherwise. The official `gtFine_trainvaltest.zip`
+  ships only the latter — `labelTrainIds` comes from
+  `cityscapesscripts/preparation/createTrainIdLabelImgs.py`, which was not
+  run — so this run read `labelIds` and mapped them at load time. The loader
+  records which flavour it found in `Cityscapes.mask_kind` rather than
+  assuming, and raises if any image has no matching mask at all.
+- The 34 labelIds map to 19 trainIds (0–18) through a 256-entry lookup table
+  built from `utils/cityscapes_labels.py`; every id with trainId −1, and
+  every id absent from the table, becomes **255** and contributes to neither
+  the loss nor the IoU. 11.3% of training pixels are 255.
+- `utils/cityscapes_labels.py` reproduces the official table from
+  `cityscapesscripts/helpers/labels.py`.
+  `verify_against_cityscapesscripts()` re-checks it entry by entry against
+  the installed package and reports any disagreement; with the package
+  absent it reports that instead of silently passing. `tools/check_env.py`
+  and `tests/test_dataset.py` both call it.
+- Images use bilinear interpolation and masks nearest-neighbour, everywhere
+  and under one shared random draw per sample, so geometry stays aligned.
+  Crops smaller than the target are padded on the right and bottom: the
+  image with the ImageNet mean colour, the mask with 255 — never class 0,
+  which would otherwise invent road pixels at the border.
+- `tools/make_train_ids.py` writes `labelTrainIds` files to disk for users
+  who want the official flavour. It is not part of the pipeline that
+  produced §7.
 
 ## 4. Environment
 
@@ -75,7 +106,7 @@ evaluation, profiling and visualization. See `MANUAL.md` §5.
 | PyTorch | READ FROM notebook cell 1 output (`torch.__version__`) |
 | CUDA | READ FROM notebook cell 1 output (`torch.version.cuda`) |
 | Driver | READ FROM `nvidia-smi` header in the notebook |
-| Platform | `<Kaggle Notebook, GPU accelerator>` |
+| Platform | `<Kaggle Notebook, T4 ×2 accelerator>` |
 
 Install: `pip install -r requirements.txt`, then copy `lib/` from the official
 repo (see `kaggle/EMCAD_Cityscapes_Kaggle.ipynb`, cell M0.2).
