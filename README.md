@@ -265,9 +265,6 @@ thin-class false negative, orange other confusion.
 
 <img src="results/qualitative/dense_0_munster_000048_000019.png" width="60%">
 
-The three images above are downscaled `_web.jpg` copies so the page loads;
-the full-resolution originals sit beside them in `results/qualitative/`
-(about 9 MB per full panel).
 
 `<name>_thincrop.png` is the same scene cropped to the window containing the
 most thin-class pixels, found by an integral-image scan. A 1024×2048 panel
