@@ -101,7 +101,7 @@ evaluation, profiling and visualization. See `MANUAL.md` §5.
 | Driver | 580.178.04 |
 | PyTorch | 2.11.0+cu128 |
 | CUDA | 12.8 |
-| Platform | `<Kaggle Notebook, T4 ×2 accelerator>` |
+| Platform | Kaggle Notebook, T4 ×2 accelerator |
 
 Install: `pip install -r requirements.txt`. `lib/` is already vendored here
 unmodified from the official repository; see the verification command at the
@@ -178,6 +178,8 @@ python -m tools.analyze_failures
 
 ### Per-class IoU
 
+<img src="results/per_class_iou.png" width="80%">
+
 | Class | Train pixel share % | IoU % |
 |---|---|---|
 | road | 37.65 | 97.89 |
@@ -209,7 +211,9 @@ python -m tools.analyze_failures
 | Medium objects (wall, fence, car, truck, bus, train) | 69.97 | 1.48 |
 | Small / thin (pole, traffic light, traffic sign, person, rider, motorcycle, bicycle) | 71.41 | 0.67 |
 
-### Per-head evaluation (100-image subset)
+### Per-head evaluation (200-image subset)
+
+<img src="results/per_head.png" width="62%">
 
 | Head | Stride | mIoU % | Large % | Small / thin % |
 |---|---|---|---|---|
@@ -242,6 +246,8 @@ iterations after warm-up, excluding dataloading and validation.
 
 ### Supervision mode cost (batch 2, 512×1024, synthetic data)
 
+<img src="results/supervision_cost.png" width="68%">
+
 | Mode | Step time s | Peak allocated GiB |
 |---|---|---|
 | deep_supervision + auxiliary heads at native stride | 0.2897 | 4.692 |
@@ -256,19 +262,29 @@ and 2.0× the memory.
 
 ## 8. Qualitative results
 
-`emcad_cityscapes_results/results/qualitative/` — 8 validation scenes, each
-as two files.
+`results/qualitative/` — 8 validation scenes, each as two files.
 
 `<name>.png` stacks four full-resolution panels vertically: input RGB,
 ground truth blended over the input, prediction blended over the input, and
 an error map, with a class legend for the classes present in that scene.
+Error map: grey ignored, white correct, red thin-class false positive, blue
+thin-class false negative, orange other confusion.
+
+<img src="results/qualitative/dense_0_munster_000048_000019_web.jpg" width="60%">
 
 `<name>_thincrop.png` is the same scene cropped to the window containing the
 most thin-class pixels, found by an integral-image scan. A 1024×2048 panel
 reproduced at page width makes a 3-pixel pole invisible, so the crops are
 what carry the failure-mode argument and the full panels establish context.
 
-Scene selection is recorded in `qualitative/scene_selection.json`: ranked by
+<img src="results/qualitative/dense_0_munster_000048_000019_thincrop_web.jpg" width="94%">
+<img src="results/qualitative/dense_2_munster_000094_000019_thincrop_web.jpg" width="94%">
+<img src="results/qualitative/dense_5_frankfurt_000000_011810_thincrop_web.jpg" width="94%">
+
+The images above are downscaled copies in `results/qualitative/`, so the page
+loads; the full-resolution originals are in `results/qualitative/`.
+
+Scene selection is recorded in `results/qualitative/scene_selection.json`: ranked by
 number of distinct classes present, then by thin-class pixel count. Six dense
 scenes (`dense_0`–`dense_5`, 16 classes each) and two sparse ones
 (`easy_6`, `easy_7`, 3 classes each) are included, so the figures are not
@@ -279,17 +295,19 @@ mid-run check.
 
 ## 9. Failure analysis
 
-Three measurements, each on a 100-image subset of the validation split.
+Three measurements, each on a 200-image subset of the validation split.
 
 **Error concentrates at boundaries.** Restricting the metric to a band of
 width *k* around every ground-truth boundary, and separately to object
 interiors:
 
+<img src="results/trimap.png" width="62%">
+
 | Band width | Band mIoU % | Interior mIoU % | Band, thin classes % | Interior, thin % |
 |---|---|---|---|---|
 | 3 px | 51.50 | 81.63 | 53.15 | 83.27 |
-| 9 px | 62.71 | 83.47 | | |
-| 15 px | 66.94 | 83.70 | | |
+| 9 px | 62.71 | 83.47 | 64.63 | 84.57 |
+| 15 px | 66.94 | 83.70 | 68.15 | 83.30 |
 
 A 30-point gap at 3 pixels, closing steadily as the band widens. This is
 consistent with a model that localises objects correctly and loses their
@@ -301,6 +319,8 @@ more for the same absolute error.
 
 **Recall is a sharp function of instance size.** Per-connected-component
 recall, thin classes:
+
+<img src="results/size_recall.png" width="80%">
 
 | Class | <64 px | >16k px |
 |---|---|---|
@@ -314,7 +334,7 @@ recall, thin classes:
 
 Pole's full progression across the six size bins is 15.9 / 38.8 / 63.3 / 77.3
 / 85.0 / 86.9. Every class lies between 15 % and 23 % on components under 64
-pixels and between 87 % and 96 % above 16k. A distant pole, a distant
+pixels and between 86.9 % and 96.3 % above 16k. A distant pole, a distant
 pedestrian and a distant traffic light share little in appearance and much in
 pixel count, which suggests the limit is the output stride rather than
 anything class-specific.
