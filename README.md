@@ -127,8 +127,8 @@ python -m tools.analyze_failures
 ### Deviations from official EMCAD defaults
 
 | Deviation | Reason |
+|---|---|
 | Supervision `deep_supervision` instead of `mutation` | measured: 0.2897 s and 4.692 GB against 0.8536 s and 9.184 GB at batch 2 (see §7) |
-| Supervision `<mode>` instead of `mutation` | `<cite results/supervision_cost.csv>` |
 | Masked Dice replaces `utils/utils.py:DiceLoss` | the original counts ignored pixels in its denominator (`MANUAL.md` §9) |
 | `CrossEntropyLoss(ignore_index=255)` | the original has no ignore index and raises on 255 |
 | Poly LR reinstated | commented out at `trainer.py:118`; standard for Cityscapes |
@@ -229,15 +229,26 @@ and 2.0× the memory.
 
 ## 8. Qualitative results
 
-`figures/qualitative_<scene>.png` — Input RGB | Ground truth | Prediction |
-Overlay | Error map. Error map: grey = ignored, white = correct, red =
-thin-class false positive, blue = thin-class false negative, orange = other
-confusion.
+`emcad_cityscapes_results/results/qualitative/` — 8 validation scenes, each
+as two files.
 
-Scenes were selected with `--strategy spread`, which ranks the whole validation
-split by per-image mIoU and samples evenly across that range, so the figures are
-not only best cases. `figures/qualitative_manifest.json` records the checkpoint,
-resolution, strategy and each scene's mIoU.
+`<name>.png` stacks four full-resolution panels vertically: input RGB,
+ground truth blended over the input, prediction blended over the input, and
+an error map, with a class legend for the classes present in that scene.
+
+`<name>_thincrop.png` is the same scene cropped to the window containing the
+most thin-class pixels, found by an integral-image scan. A 1024×2048 panel
+reproduced at page width makes a 3-pixel pole invisible, so the crops are
+what carry the failure-mode argument and the full panels establish context.
+
+Scene selection is recorded in `qualitative/scene_selection.json`: ranked by
+number of distinct classes present, then by thin-class pixel count. Six dense
+scenes (`dense_0`–`dense_5`, 16 classes each) and two sparse ones
+(`easy_6`, `easy_7`, 3 classes each) are included, so the figures are not
+only the crowded cases.
+
+`results/sanity/` holds five prediction overlays written during training as a
+mid-run check.
 
 ## 9. Failure analysis
 
@@ -308,7 +319,12 @@ mechanism without measuring it.
 - `tests/test_dataset.py` — 8 dataset checks plus manual overlay inspection.
 - `logs/overfit.json` — tiny-overfit evidence (12 images, augmentation off,
   pass criterion computed only over classes actually present).
-- Official-evaluator cross-check: `<result, or why it was not run>`.
+- Official-evaluator cross-check: not run. `tools/official_eval_crosscheck.py`
+  is in place but the official `cityscapesScripts` evaluator needs the
+  `labelTrainIds` ground truth written to disk and a separate pass over the
+  split, which did not fit the session budget. The metric here is validated
+  instead by the eight unit tests above, including a hand-computed case and
+  exact 1.000000 mIoU on ground truth.
 
 ## 11. Reproducibility
 
