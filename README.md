@@ -249,9 +249,9 @@ most thin-class pixels, found by an integral-image scan. A 1024×2048 panel
 reproduced at page width makes a 3-pixel pole invisible, so the crops are
 what carry the failure-mode argument and the full panels establish context.
 
-<img src="results/qualitative/dense_0_munster_000048_000019_thincrop_web.jpg" width="94%">
-<img src="results/qualitative/dense_2_munster_000094_000019_thincrop_web.jpg" width="94%">
-<img src="results/qualitative/dense_5_frankfurt_000000_011810_thincrop_web.jpg" width="94%">
+<img src="results/qualitative/dense_0_munster_000048_000019_thincrop.png" width="94%">
+<img src="results/qualitative/dense_2_munster_000094_000019_thincrop.png" width="94%">
+<img src="results/qualitative/dense_5_frankfurt_000000_011810_thincrop.png" width="94%">
 
 The images above are downscaled copies in `results/qualitative/`, so the page
 loads; the full-resolution originals are in `results/qualitative/`.
