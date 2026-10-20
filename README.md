@@ -71,10 +71,10 @@ evaluation, profiling and visualization. See `MANUAL.md` §5.
 
 | | |
 |---|---|
-| GPU | `<summary.json: gpu_name>` |
-| PyTorch | `<...>` |
-| CUDA | `<...>` |
-| Driver | `<...>` |
+| GPU | NVIDIA Tesla T4, 15 GB (single card used) |
+| PyTorch | READ FROM notebook cell 1 output (`torch.__version__`) |
+| CUDA | READ FROM notebook cell 1 output (`torch.version.cuda`) |
+| Driver | READ FROM `nvidia-smi` header in the notebook |
 | Platform | `<Kaggle Notebook, GPU accelerator>` |
 
 Install: `pip install -r requirements.txt`, then copy `lib/` from the official
@@ -107,31 +107,34 @@ python -m tools.analyze_failures
 
 | Item | Value |
 |---|---|
-| Encoder | PVTv2-B2, pretrained (`sha256 <results/pretrained_sha256.txt>`) |
+| Encoder | PVTv2-B2, ImageNet pretrained, 332 tensors matched |
 | Decoder | EMCAD, unmodified |
 | Classes / ignore index | 19 / 255 |
 | Train crop | 512×1024 |
-| Augmentation | random scale 0.5–2.0, random crop, horizontal flip, colour jitter |
-| Validation resolution | `<native 1024×2048 | 512×1024>` |
-| Batch size | `<...>` (grad accumulation `<...>`) |
-| Optimizer | AdamW, lr `<...>`, weight decay `<...>` |
-| Schedule | `<n>` iterations, poly power 0.9, `<n>` warmup |
+| Augmentation | random scale 0.5–1.25, random crop, horizontal flip, colour jitter |
+| Validation resolution | native 1024×2048 |
+| Batch size | 4 (no gradient accumulation) |
+| Optimizer | AdamW, lr 6e-5, weight decay READ FROM logs/config.json |
+| Schedule | 10,500 iterations, poly power 0.9, 500 warmup |
 | Loss | `0.3·CE(ignore_index=255) + 0.7·masked multiclass Dice` |
-| Supervision | `<mode>` (`<n>` loss terms) |
-| AMP | `<on/off>` |
-| Seed | `<...>`, `cudnn.deterministic=True` |
+| Supervision | deep_supervision with auxiliary heads at native stride (4 loss terms) |
+| AMP | on, fp16 autocast, loss computed in fp32 |
+| Devices | single T4 (`CUDA_VISIBLE_DEVICES=0`); DataParallel measured 4.1× slower |
+| Seed | READ FROM logs/config.json, `cudnn.deterministic=True` |
+| Epochs | 14.1 (10,500 × 4 = 42,000 images / 2,975) |
+| Wall clock | 2.153 h, exit code 0 |
 
 ### Deviations from official EMCAD defaults
 
 | Deviation | Reason |
-|---|---|
+| Supervision `deep_supervision` instead of `mutation` | measured: 0.2897 s and 4.692 GB against 0.8536 s and 9.184 GB at batch 2 (see §7) |
 | Supervision `<mode>` instead of `mutation` | `<cite results/supervision_cost.csv>` |
 | Masked Dice replaces `utils/utils.py:DiceLoss` | the original counts ignored pixels in its denominator (`MANUAL.md` §9) |
 | `CrossEntropyLoss(ignore_index=255)` | the original has no ignore index and raises on 255 |
 | Poly LR reinstated | commented out at `trainer.py:118`; standard for Cityscapes |
 | AMP enabled | memory headroom at 512×1024 |
 | Iteration-based schedule + resume | bounded GPU sessions |
-| `<torch.load(weights_only=False) at networks.py:68, if applied>` | `<torch ≥ 2.6 default change>` |
+
 
 ## 7. Results
 
@@ -139,37 +142,90 @@ python -m tools.analyze_failures
 
 | Metric | Value |
 |---|---|
-| **mIoU (19 classes)** | `<...>` |
-| Pixel accuracy | `<...>` |
-| Classes counted | `<...>` / 19 |
-| Evaluated head | `P[-1]` (finest) |
+| **mIoU (19 classes)** | **75.86 %** |
+| Pixel accuracy | 95.70 % |
+| Classes counted | 19 / 19 |
+| Evaluated head | `P[-1]` (finest, stride 4) |
+| Validation images | 500, native 1024×2048, no test-time augmentation |
+| Schedule | 10,500 iterations = 14.1 epochs |
 
 ### Per-class IoU
 
-`<paste results/per_class_iou.csv as a markdown table — template in MANUAL.md §24>`
+| Class | Train pixel share % | IoU % |
+|---|---|---|
+| road | 37.65 | 97.89 |
+| sidewalk | 5.41 | 83.44 |
+| building | 21.92 | 91.68 |
+| wall | 0.73 | 51.73 |
+| fence | 0.82 | 57.09 |
+| pole | 1.48 | 63.85 |
+| traffic light | 0.20 | 72.47 |
+| traffic sign | 0.67 | 79.56 |
+| vegetation | 17.32 | 92.26 |
+| terrain | 0.83 | 62.29 |
+| sky | 3.36 | 94.16 |
+| person | 1.30 | 81.79 |
+| rider | 0.22 | 59.97 |
+| car | 6.51 | 93.69 |
+| truck | 0.30 | 64.31 |
+| bus | 0.39 | 78.85 |
+| train | 0.11 | 74.15 |
+| motorcycle | 0.08 | 64.95 |
+| bicycle | 0.71 | 77.26 |
+| **mean** | | **75.86** |
 
 ### Supplementary grouping (does **not** affect the mIoU above)
 
 | Group | Mean IoU (%) | Mean train pixel share (%) |
 |---|---|---|
-| Large regions (road, sidewalk, building, vegetation, terrain, sky) | | |
-| Medium objects (wall, fence, car, truck, bus, train) | | |
-| Small / thin (pole, traffic light, traffic sign, person, rider, motorcycle, bicycle) | | |
+| Large regions (road, sidewalk, building, vegetation, terrain, sky) | 86.95 | 14.37 |
+| Medium objects (wall, fence, car, truck, bus, train) | 69.97 | 1.48 |
+| Small / thin (pole, traffic light, traffic sign, person, rider, motorcycle, bicycle) | 71.41 | 0.67 |
 
-### Efficiency
+### Per-head evaluation (100-image subset)
+
+| Head | Stride | mIoU % | Large % | Small / thin % |
+|---|---|---|---|---|
+| P4 | 32 | 54.20 | 76.49 | 38.40 |
+| P3 | 16 | 63.94 | 81.44 | 53.21 |
+| P2 | 8 | 70.26 | 84.06 | 63.84 |
+| **P1** | **4** | **74.51** | **85.92** | **71.44** |
+
+Monotonic in resolution. Summing all four heads at inference, which the
+upstream code offers, costs 6.3 points: 69.59 % against 75.86 %, and
+60.05 % against 71.41 % on the thin classes. `P[-1]` alone is reported.
 
 | Measurement | Value |
 |---|---|
-| Peak GPU memory (allocated) | `<...>` GiB |
-| Peak GPU memory (reserved) | `<...>` GiB |
-| Mean training step time | `<...>` s ± `<...>` over `<n>` iterations |
-| Warm-up excluded | `<n>` iterations |
-| Mean dataloading wait (excluded) | `<...>` s |
+| Parameters, total | 26.78 M |
+| Encoder / decoder / heads | 24.85 M / 1.913 M / 19.5 K |
+| Decoder vs published | 1.913 M vs 1.91 M |
+| Peak GPU memory (allocated), training | 8.905 GiB |
+| Peak GPU memory (allocated / reserved), benchmark | 4.692 / 5.025 GiB |
+| Mean training step time, logged | 0.546 s (batch 4, 512×1024, AMP) |
+| Mean training step time, compute only | 0.2897 s (batch 2, synthetic data) |
+| Inference, 1024×2048 | 0.4863 s |
+| Inference, 512×1024 | 0.0546 s |
+| Training wall clock | 2.153 h for 10,500 iterations |
 
 **Step time is defined as** forward + loss + backward + optimizer.step +
 zero_grad, measured with `torch.cuda.synchronize()` immediately before starting
-and immediately after finishing the timed GPU work, averaged after a
-20-iteration warm-up, excluding dataloading and validation.
+and immediately after finishing the timed GPU work, median over the timed
+iterations after warm-up, excluding dataloading and validation.
+
+### Supervision mode cost (batch 2, 512×1024, synthetic data)
+
+| Mode | Step time s | Peak allocated GiB |
+|---|---|---|
+| deep_supervision + auxiliary heads at native stride | 0.2897 | 4.692 |
+| deep_supervision | 0.4656 | 5.807 |
+| mutation | 0.8536 | 9.184 |
+| last_layer | 0.2901 | 4.905 |
+
+Four loss terms for the cost of one: keeping the auxiliary heads at native
+decoder stride matches `last_layer` to within 0.4 ms. Upsampling them to full
+resolution first costs 61 % more time; MUTATION's 15 subsets cost 2.9× the time
+and 2.0× the memory.
 
 ## 8. Qualitative results
 
@@ -185,14 +241,62 @@ resolution, strategy and each scene's mIoU.
 
 ## 9. Failure analysis
 
-`<Write from results/failure_analysis.json and the panels. Pair every visual
-claim with a number. Use hedged language — "may indicate", "suggests", "is
-consistent with". Cover: road/sidewalk boundaries, poles, traffic lights,
-traffic signs, person/rider confusion, bicycle/motorcycle, distant vehicles,
-occlusion. Include the precision/recall distinction for thin classes and the
-caveat that IoU penalizes a fixed boundary error far more for thin objects than
-large ones, so part of the measured gap is metric geometry rather than model
-failure.>`
+Three measurements, each on a 100-image subset of the validation split.
+
+**Error concentrates at boundaries.** Restricting the metric to a band of
+width *k* around every ground-truth boundary, and separately to object
+interiors:
+
+| Band width | Band mIoU % | Interior mIoU % | Band, thin classes % | Interior, thin % |
+|---|---|---|---|---|
+| 3 px | 51.50 | 81.63 | 53.15 | 83.27 |
+| 9 px | 62.71 | 83.47 | | |
+| 15 px | 66.94 | 83.70 | | |
+
+A 30-point gap at 3 pixels, closing steadily as the band widens. This is
+consistent with a model that localises objects correctly and loses their
+edges, which is the expected signature of a prediction made at stride 4 and
+bilinearly upsampled. Part of this gap is metric geometry rather than model
+failure: a fixed boundary error of *n* pixels removes a far larger fraction of
+a 4-pixel-wide pole than of a building facade, so IoU penalises thin classes
+more for the same absolute error.
+
+**Recall is a sharp function of instance size.** Per-connected-component
+recall, thin classes:
+
+| Class | <64 px | >16k px |
+|---|---|---|
+| pole | 15.9 % | 86.9 % |
+| traffic light | 17.0 % | 95.0 % |
+| traffic sign | 15.5 % | 90.1 % |
+| person | 22.7 % | 96.3 % |
+| rider | 18.5 % | 89.4 % |
+| motorcycle | 15.0 % | 88.8 % |
+| bicycle | 16.1 % | 91.7 % |
+
+Pole's full progression across the six size bins is 15.9 / 38.8 / 63.3 / 77.3
+/ 85.0 / 86.9. Every class lies between 15 % and 23 % on components under 64
+pixels and between 87 % and 96 % above 16k. A distant pole, a distant
+pedestrian and a distant traffic light share little in appearance and much in
+pixel count, which suggests the limit is the output stride rather than
+anything class-specific.
+
+**Residual confusions are semantic rather than spatial.** Pole is absorbed by
+building in 12.0 % of its ground-truth pixels, rider by person in 8.0 %, and
+motorcycle by bicycle in 4.2 %. For comparison, an 88-iteration checkpoint
+from the same code gave 32.5 % and 52.7 % for the first two — the errors that
+remain are between genuinely similar categories, not the adjacency confusions
+of an undertrained model where thin objects are absorbed into their
+surroundings.
+
+**Road / sidewalk.** Road reaches 97.89 % and sidewalk 83.44 %; the 14-point
+gap is consistent with the shared, often unmarked boundary between them, where
+the trimap result above locates most of the remaining error.
+
+**Wall and fence** are the weakest classes at 51.73 % and 57.09 %. Both are
+large and flat and are plausibly confused with building, which the group
+averages hide. I did not analyse them specifically and would not claim the
+mechanism without measuring it.
 
 ## 10. Validation of the evaluation code
 
@@ -219,8 +323,30 @@ bit-identical across GPU models or PyTorch versions.
 
 ## 12. Limitations
 
-`<at least five: short schedule, half-resolution training, single seed,
-supervision deviation, evaluation protocol, no multi-scale inference>`
+1. **Short schedule.** 10,500 iterations is 14.1 epochs, against the
+   40k–80k iterations standard on this benchmark. A held-out thin-class probe
+   moved only from 0.7103 to 0.7162 mIoU over the final 2,500 iterations, so
+   the model is near the flat part of its curve for this schedule — but a
+   longer run would still add several points, most of them on the classes
+   below 65 % IoU.
+2. **Half-resolution training.** 512×1024 random crops, evaluated at native
+   1024×2048. Training at full resolution would change the scale statistics
+   the model sees.
+3. **Single seed, single configuration.** No variance estimate, so a
+   difference of a point or two between configurations is not resolvable here.
+4. **Supervision deviation.** Deep supervision with four loss terms rather
+   than EMCAD's MUTATION over 15 subsets. The cost measurement in §7
+   justifies it on this hardware but it is a deviation from the paper.
+5. **Evaluation protocol.** One confusion matrix over the whole split, no
+   multi-scale or flipped test-time augmentation, no official-evaluator
+   cross-check. Published Cityscapes numbers often include TTA, so 75.86 % is
+   not directly comparable to a table that does.
+6. **Small-batch BatchNorm.** Batch 4 on one card means the decoder's
+   BatchNorm layers normalise over 4 samples. Synchronised BatchNorm or a
+   larger batch would likely help the rare classes.
+7. **Subset analyses.** Per-head, trimap and size-recall use 100 validation
+   images for time reasons; the per-class table, mIoU and pixel accuracy use
+   all 500.
 
 ## 13. Repository layout
 

@@ -21,46 +21,46 @@
     "bicycle"
   ],
   "per_class_iou": [
-    0.7733557651467557,
-    0.4786444424872116,
-    0.7857870132489341,
-    6.548176422159743e-06,
-    5.84964264666018e-06,
-    0.09701125263034498,
-    0.0,
-    0.2762178118726964,
-    0.8472741712068341,
-    1.7177074925089596e-05,
-    0.7355013265465039,
-    0.3766777617054248,
-    0.0,
-    0.5249248988662957,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.013182534293253828
+    0.9789185682484155,
+    0.8344497780604696,
+    0.9168361773266952,
+    0.5173279510759291,
+    0.5708569189773873,
+    0.6385259414922212,
+    0.7247177316930505,
+    0.7956471967587577,
+    0.9226359285903327,
+    0.6228897176085378,
+    0.9415595440912135,
+    0.8178951495692848,
+    0.5997198363719665,
+    0.9369216707277827,
+    0.6430549811632627,
+    0.7884939138044056,
+    0.7414877711409954,
+    0.6495095234514379,
+    0.7725838124349865
   ],
   "per_class_acc": [
-    0.9881244793809378,
-    0.5801906616302578,
-    0.856602748061112,
-    6.54926123589025e-06,
-    5.849709528684915e-06,
-    0.10925618204439475,
-    0.0,
-    0.30429378458811884,
-    0.9300679593087111,
-    1.718026928695063e-05,
-    0.8639310325347541,
-    0.6036974760572611,
-    0.0,
-    0.5460719810882139,
-    0.0,
-    0.0,
-    0.0,
-    0.0,
-    0.013203832745917235
+    0.9904127746812688,
+    0.9007094846960938,
+    0.962558488719021,
+    0.6265213822215838,
+    0.6884516496912084,
+    0.7608765457598887,
+    0.8598402006643467,
+    0.8665280067322875,
+    0.9634789088562122,
+    0.6900396142911512,
+    0.97208482647701,
+    0.904191859535932,
+    0.8176271869349806,
+    0.9737673685771379,
+    0.6996588304299924,
+    0.853747277666764,
+    0.8734723471571699,
+    0.8170588759485341,
+    0.8771704096026197
   ],
   "gt_pixel_share": [
     0.3765076125962385,
@@ -83,210 +83,210 @@
     0.0007954201673680758,
     0.007093068545535073
   ],
-  "miou": 0.25834771331043416,
-  "pixel_acc": 0.8284195892586851,
+  "miou": 0.7586332690835332,
+  "pixel_acc": 0.9570046324333162,
   "group_miou": {
-    "large_regions": 0.6034299826185274,
-    "mid_objects": 0.08748954944756075,
-    "thin_small": 0.10901276578595999
+    "large_regions": 0.8695482856542774,
+    "mid_objects": 0.6996905344816272,
+    "thin_small": 0.7140855988245294
   },
-  "checkpoint": "/kaggle/working/runs/b2_ds/last.pth",
-  "train_iter": 88,
+  "checkpoint": "/kaggle/working/runs/b2_single/last.pth",
+  "train_iter": 10500,
   "head": -1,
   "inference": "whole_image",
   "resolution": "1024x2048",
   "n_images": 500,
-  "seconds": 259.1,
+  "seconds": 259.6,
   "peak_alloc_GB": 2.339,
   "top_confusions": {
     "road": [
       {
         "confused_with": "sidewalk",
-        "share_of_gt": 0.010902764785723286
+        "share_of_gt": 0.006249328739158144
       },
       {
         "confused_with": "car",
-        "share_of_gt": 0.0003333358029379695
+        "share_of_gt": 0.0016235787176717145
       }
     ],
     "sidewalk": [
       {
         "confused_with": "road",
-        "share_of_gt": 0.4113882499770218
+        "share_of_gt": 0.0652602374581419
       },
       {
-        "confused_with": "vegetation",
-        "share_of_gt": 0.002450197758050794
+        "confused_with": "building",
+        "share_of_gt": 0.0064495399229335506
       }
     ],
     "building": [
       {
-        "confused_with": "road",
-        "share_of_gt": 0.07233465854464388
+        "confused_with": "vegetation",
+        "share_of_gt": 0.015584837838309521
       },
       {
-        "confused_with": "vegetation",
-        "share_of_gt": 0.03198589741566581
+        "confused_with": "pole",
+        "share_of_gt": 0.005652663270367007
       }
     ],
     "wall": [
       {
-        "confused_with": "road",
-        "share_of_gt": 0.4731882920047661
+        "confused_with": "building",
+        "share_of_gt": 0.21512536997744225
       },
       {
-        "confused_with": "building",
-        "share_of_gt": 0.3151745638601346
+        "confused_with": "vegetation",
+        "share_of_gt": 0.06896729313823481
       }
     ],
     "fence": [
       {
         "confused_with": "building",
-        "share_of_gt": 0.442958219380327
+        "share_of_gt": 0.16954186537398722
       },
       {
-        "confused_with": "road",
-        "share_of_gt": 0.30898179025308103
+        "confused_with": "wall",
+        "share_of_gt": 0.04429772309362952
       }
     ],
     "pole": [
       {
         "confused_with": "building",
-        "share_of_gt": 0.3245572017221723
+        "share_of_gt": 0.12026736926435858
       },
       {
         "confused_with": "vegetation",
-        "share_of_gt": 0.20710303915961908
+        "share_of_gt": 0.049336272519917575
       }
     ],
     "traffic light": [
       {
         "confused_with": "building",
-        "share_of_gt": 0.3675816042198792
+        "share_of_gt": 0.0633385552808488
       },
       {
         "confused_with": "vegetation",
-        "share_of_gt": 0.27504253776695664
+        "share_of_gt": 0.040672022066000034
       }
     ],
     "traffic sign": [
       {
         "confused_with": "building",
-        "share_of_gt": 0.42339473167679315
+        "share_of_gt": 0.06881163221731436
       },
       {
-        "confused_with": "road",
-        "share_of_gt": 0.1537518285614868
+        "confused_with": "vegetation",
+        "share_of_gt": 0.021803520381583744
       }
     ],
     "vegetation": [
       {
-        "confused_with": "road",
-        "share_of_gt": 0.04213213902700914
+        "confused_with": "building",
+        "share_of_gt": 0.01946746886887384
       },
       {
-        "confused_with": "building",
-        "share_of_gt": 0.014927882774233564
+        "confused_with": "pole",
+        "share_of_gt": 0.004275700366306601
       }
     ],
     "terrain": [
       {
-        "confused_with": "sidewalk",
-        "share_of_gt": 0.3627435499892066
+        "confused_with": "vegetation",
+        "share_of_gt": 0.18086731769832654
       },
       {
-        "confused_with": "road",
-        "share_of_gt": 0.33834769874883047
+        "confused_with": "sidewalk",
+        "share_of_gt": 0.07639016575156596
       }
     ],
     "sky": [
       {
-        "confused_with": "road",
-        "share_of_gt": 0.11676247305125471
+        "confused_with": "building",
+        "share_of_gt": 0.018075011473135668
       },
       {
-        "confused_with": "building",
-        "share_of_gt": 0.012672732083925463
+        "confused_with": "vegetation",
+        "share_of_gt": 0.008065243015136479
       }
     ],
     "person": [
       {
-        "confused_with": "road",
-        "share_of_gt": 0.32999110918909624
+        "confused_with": "rider",
+        "share_of_gt": 0.028029725123524522
       },
       {
         "confused_with": "building",
-        "share_of_gt": 0.022905505587646337
+        "share_of_gt": 0.02556443890522154
       }
     ],
     "rider": [
       {
         "confused_with": "person",
-        "share_of_gt": 0.5269336443280914
+        "share_of_gt": 0.08013632341835071
       },
       {
-        "confused_with": "road",
-        "share_of_gt": 0.3933714180429602
+        "confused_with": "bicycle",
+        "share_of_gt": 0.05593451292673198
       }
     ],
     "car": [
       {
-        "confused_with": "road",
-        "share_of_gt": 0.43671954649777184
+        "confused_with": "building",
+        "share_of_gt": 0.005812957067323775
       },
       {
-        "confused_with": "building",
-        "share_of_gt": 0.00586636297733562
+        "confused_with": "road",
+        "share_of_gt": 0.005493509365462954
       }
     ],
     "truck": [
       {
-        "confused_with": "road",
-        "share_of_gt": 0.6270824947802903
+        "confused_with": "car",
+        "share_of_gt": 0.20718705925018052
       },
       {
         "confused_with": "building",
-        "share_of_gt": 0.17583112305544757
+        "share_of_gt": 0.05609027715634783
       }
     ],
     "bus": [
       {
-        "confused_with": "road",
-        "share_of_gt": 0.6293512427310896
+        "confused_with": "car",
+        "share_of_gt": 0.07981432003412739
       },
       {
-        "confused_with": "car",
-        "share_of_gt": 0.17367728283077752
+        "confused_with": "building",
+        "share_of_gt": 0.02131867576730506
       }
     ],
     "train": [
       {
-        "confused_with": "road",
-        "share_of_gt": 0.5352717205868668
+        "confused_with": "building",
+        "share_of_gt": 0.05709796364651509
       },
       {
-        "confused_with": "building",
-        "share_of_gt": 0.3543650547473557
+        "confused_with": "vegetation",
+        "share_of_gt": 0.021015889140482025
       }
     ],
     "motorcycle": [
       {
-        "confused_with": "road",
-        "share_of_gt": 0.5886580341780742
+        "confused_with": "bicycle",
+        "share_of_gt": 0.0416169121830508
       },
       {
-        "confused_with": "person",
-        "share_of_gt": 0.18895690382018468
+        "confused_with": "car",
+        "share_of_gt": 0.03281533831906391
       }
     ],
     "bicycle": [
       {
-        "confused_with": "road",
-        "share_of_gt": 0.45276613408461097
+        "confused_with": "rider",
+        "share_of_gt": 0.031672194911964456
       },
       {
-        "confused_with": "person",
-        "share_of_gt": 0.395249116954097
+        "confused_with": "building",
+        "share_of_gt": 0.017050569031320746
       }
     ]
   }
