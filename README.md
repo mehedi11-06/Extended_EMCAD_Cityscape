@@ -22,7 +22,7 @@ diff -r lib /tmp/EMCAD_ref/lib        # expect no output
 
 ## 1. Objective
 
-`<2–3 sentences: adapt EMCAD to 19-class Cityscapes, train, evaluate on val,
+`Adapt EMCAD to 19-class Cityscapes, train, evaluate on val,
 report per-class IoU / mIoU / peak memory / step time, and analyse failure
 modes on thin classes.>`
 
