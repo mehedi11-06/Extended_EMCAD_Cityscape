@@ -61,7 +61,7 @@ crop raises a `RuntimeError` inside the decoder rather than failing silently.
 
 The substantive work was the **task pipeline**: dataset and label handling,
 ignore-index correctness in both losses and the metric, confusion-matrix
-evaluation, profiling and visualization. See `MANUAL.md` §5.
+evaluation, profiling and visualization.
 
 ## 3. Cityscapes label handling
 
@@ -117,16 +117,37 @@ python -m tools.tiny_overfit --data-root $ROOT --images 12 --iters 300 --amp
 python -m tools.supervision_cost --crop 512 1024 --batch 2 --amp
 
 # primary experiment
-python -W ignore train_cityscapes.py --config configs/cityscapes_pvtv2b2.yaml \
-    --data-root $ROOT --out-dir runs/primary
+CUDA_VISIBLE_DEVICES=0 python -W ignore train_cityscapes.py \
+    --config configs/cityscapes_pvtv2b2.yaml \
+    --data-root $ROOT --out-dir runs/b2_single
 
 # evaluation, figures, analysis
-python -W ignore eval_cityscapes.py --checkpoint runs/primary/best_miou.pth \
-    --data-root $ROOT --out-dir results --save-preds results/preds_trainids
-python -W ignore visualize_cityscapes.py --checkpoint runs/primary/best_miou.pth \
-    --data-root $ROOT --num-images 8 --strategy spread
+CUDA_VISIBLE_DEVICES=0 python -W ignore eval_cityscapes.py \
+    --checkpoint runs/b2_single/last.pth --data-root $ROOT --out-dir results
+CUDA_VISIBLE_DEVICES=0 python -W ignore visualize_cityscapes.py \
+    --checkpoint runs/b2_single/last.pth --data-root $ROOT \
+    --val-resize 1024 2048 --num-images 8
 python -m tools.analyze_failures
 ```
+
+`CUDA_VISIBLE_DEVICES=0` is deliberate. A 12-iteration probe of both
+configurations measured 11.357 s/step under DataParallel across two T4s
+against 2.790 s/step on one card: the gradient all-reduce over PCIe, on
+hardware without NVLink, costs more than the parallelism returns at this batch
+size.
+
+`last.pth` rather than `best_miou.pth`: checkpoint selection runs against a
+100-image probe at `val_interval`, which is a progress estimate rather than a
+model-selection signal, so the reported numbers come from the final weights.
+`results/val_results.json` and `results/analysis.json` both record
+`runs/b2_single/last.pth`.
+
+`configs/cityscapes_pvtv2b2.yaml` holds the configuration of the run reported
+in §7, as recorded in `results/logs/config.json`. Two settings of that run are
+not expressible in the config file: the auxiliary heads were kept at native
+decoder stride, and the decoder parameters took a 10x learning-rate multiplier
+over the encoder. Both are in `results/logs/config.json` as `aux_native` and
+`decoder_lr_mult`.
 
 ## 6. Experimental configuration
 
@@ -154,7 +175,7 @@ python -m tools.analyze_failures
 | Deviation | Reason |
 |---|---|
 | Supervision `deep_supervision` instead of `mutation` | measured: 0.2897 s and 4.692 GB against 0.8536 s and 9.184 GB at batch 2 (see §7) |
-| Masked Dice replaces `utils/utils.py:DiceLoss` | the original counts ignored pixels in its denominator (`MANUAL.md` §9) |
+| Masked Dice replaces `utils/utils.py:DiceLoss` | the original counts ignored pixels in its denominator — the softmax still sums to one there, so the model is penalised for predicting anything on the ego-vehicle hood. `tests/test_losses.py` demonstrates it numerically |
 | `CrossEntropyLoss(ignore_index=255)` | the original has no ignore index and raises on 255 |
 | Poly LR reinstated | commented out at `trainer.py:118`; standard for Cityscapes |
 | AMP enabled | memory headroom at 512×1024 |
@@ -242,7 +263,11 @@ an error map, with a class legend for the classes present in that scene.
 Error map: grey ignored, white correct, red thin-class false positive, blue
 thin-class false negative, orange other confusion.
 
-<img src="results/qualitative/dense_0_munster_000048_000019_web.jpg" width="60%">
+<img src="results/qualitative/dense_0_munster_000048_000019.png" width="60%">
+
+The three images above are downscaled `_web.jpg` copies so the page loads;
+the full-resolution originals sit beside them in `results/qualitative/`
+(about 9 MB per full panel).
 
 `<name>_thincrop.png` is the same scene cropped to the window containing the
 most thin-class pixels, found by an integral-image scan. A 1024×2048 panel

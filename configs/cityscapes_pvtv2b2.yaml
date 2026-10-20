@@ -1,14 +1,18 @@
 # EMCAD on Cityscapes, 19 classes - primary experiment
 #
-# Every value here is a STARTING POINT chosen to fit a bounded Kaggle GPU
-# session, not a tuned or published setting. Record whatever you actually ran.
+# These values are the configuration of the run reported in README §7, as
+# recorded in results/logs/config.json. Two settings used by that run are not
+# expressible here and are noted in README §6: the auxiliary heads were kept
+# at native decoder stride, and the decoder used a 10x learning-rate
+# multiplier over the encoder.
 
 # --- data ---
 data_root: null                 # null -> auto-discover under /kaggle/input
 crop_size: [512, 1024]          # H W; both MUST be divisible by 32
-val_resize: [512, 1024]         # null -> evaluate at native 1024x2048
+val_resize: null                # null -> evaluate at native 1024x2048
 scale_min: 0.5
-scale_max: 2.0
+scale_max: 1.25                 # 2.0 resizes to 2048x4096 before cropping and
+                                # drove the host out of RAM; see README §7
 
 # --- model (lib/ is the unmodified official EMCAD) ---
 encoder: pvt_v2_b2
@@ -23,7 +27,7 @@ concatenation: false
 
 # --- supervision & loss ---
 # mutation = EMCAD's default (15 loss terms); deep_supervision = 4; last_layer = 1.
-# Measure all three with tools/supervision_cost.py before committing.
+# Measured costs for all three are in README §7.
 supervision: deep_supervision
 loss: ce_dice                   # ce | ce_dice | ce_focal | ce_dice_focal
 w_ce: 0.3                       # EMCAD trainer.py:103 weighting
@@ -32,22 +36,22 @@ w_focal: 0.0
 focal_gamma: 2.0
 
 # --- optimization ---
-batch_size: 2
+batch_size: 4
 grad_accum: 1                   # raise to simulate a larger batch under OOM
 lr: 0.00006                     # AdamW; EMCAD uses 1e-4 at 224x224 batch 6
 weight_decay: 0.01
 poly_power: 0.9
 warmup_iters: 500
-max_iters: 20000
+max_iters: 10500
 amp: true
 
 # --- schedule / IO ---
-val_interval: 2000
+val_interval: 2500
 log_interval: 50
 num_workers: 2
-out_dir: /kaggle/working/runs/emcad_cityscapes_ce_dice
-max_hours: 10.5                 # checkpoint and stop before the session is killed
-seed: 1234
+out_dir: /kaggle/working/runs/b2_single
+max_hours: 8.5                  # checkpoint and stop before the session is killed
+seed: 2222
 deterministic: true
 train_limit: null
 val_limit: null
