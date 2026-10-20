@@ -24,11 +24,6 @@ otherwise.
 
 ## 1. Objective
 
-<<<<<<< HEAD
-`Adapt EMCAD to 19-class Cityscapes, train, evaluate on val,
-report per-class IoU / mIoU / peak memory / step time, and analyse failure
-modes on thin classes.>`
-=======
 EMCAD was published for binary medical image segmentation. This work takes
 the decoder unchanged and asks what it does on 19-class urban scenes, where
 the classes of interest are often a few pixels wide. The pipeline here trains
@@ -38,7 +33,7 @@ over the whole split, and reports per-class IoU, mIoU, peak GPU memory and
 training step time alongside a failure analysis of the thin classes —
 boundary-band accuracy, per-instance recall against object size, and the
 contribution of each of the four decoder heads.
->>>>>>> 4b1b5c7 (updated results on full 10500 iterations)
+
 
 ## 2. Architecture adaptation
 
