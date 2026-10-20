@@ -98,13 +98,14 @@ evaluation, profiling and visualization. See `MANUAL.md` §5.
 | | |
 |---|---|
 | GPU | NVIDIA Tesla T4, 15 GB (single card used) |
-| PyTorch | READ FROM notebook cell 1 output (`torch.__version__`) |
-| CUDA | READ FROM notebook cell 1 output (`torch.version.cuda`) |
-| Driver | READ FROM `nvidia-smi` header in the notebook |
+| Driver | 580.178.04 |
+| PyTorch | 2.11.0+cu128 |
+| CUDA | 12.8 |
 | Platform | `<Kaggle Notebook, T4 ×2 accelerator>` |
 
-Install: `pip install -r requirements.txt`, then copy `lib/` from the official
-repo (see `kaggle/EMCAD_Cityscapes_Kaggle.ipynb`, cell M0.2).
+Install: `pip install -r requirements.txt`. `lib/` is already vendored here
+unmodified from the official repository; see the verification command at the
+top of this file.
 
 ## 5. Exact commands
 
@@ -320,11 +321,9 @@ anything class-specific.
 
 **Residual confusions are semantic rather than spatial.** Pole is absorbed by
 building in 12.0 % of its ground-truth pixels, rider by person in 8.0 %, and
-motorcycle by bicycle in 4.2 %. For comparison, an 88-iteration checkpoint
-from the same code gave 32.5 % and 52.7 % for the first two — the errors that
-remain are between genuinely similar categories, not the adjacency confusions
-of an undertrained model where thin objects are absorbed into their
-surroundings.
+motorcycle by bicycle in 4.2 %. These are confusions between genuinely
+similar categories — a rider is a person, a motorcycle resembles a bicycle —
+rather than thin objects being absorbed into whatever surrounds them.
 
 **Road / sidewalk.** Road reaches 97.89 % and sidewalk 83.44 %; the 14-point
 gap is consistent with the shared, often unmarked boundary between them, where
@@ -343,13 +342,10 @@ mechanism without measuring it.
   and a numerical demonstration that the original EMCAD Dice responds to
   ignored-region logits while the masked version does not.
 - `tests/test_dataset.py` — 8 dataset checks plus manual overlay inspection.
-- `logs/overfit.json` — tiny-overfit evidence (12 images, augmentation off,
-  pass criterion computed only over classes actually present).
 - Official-evaluator cross-check: not run. `tools/official_eval_crosscheck.py`
   is in place but the official `cityscapesScripts` evaluator needs the
   `labelTrainIds` ground truth written to disk and a separate pass over the
-  split, which did not fit the session budget. The metric here is validated
-  instead by the eight unit tests above, including a hand-computed case and
+  split. The metric here is validated instead by the eight unit tests above, including a hand-computed case and
   exact 1.000000 mIoU on ground truth.
 
 ## 11. Reproducibility
@@ -390,10 +386,6 @@ bit-identical across GPU models or PyTorch versions.
    images for time reasons; the per-class table, mIoU and pixel accuracy use
    all 500.
 
-## 13. Repository layout
-
-See `MANUAL.md` §22. `MANUAL.md` is the full technical manual: milestones,
-gates, loss derivations, profiling protocol, and the troubleshooting tree.
 
 ## Attribution
 
