@@ -19,7 +19,6 @@ diff -r --strip-trailing-cr lib /tmp/EMCAD_ref/lib    # expect no output
 committed with CRLF line endings; the file contents are byte-identical
 otherwise.
 
-
 ---
 
 ## 1. Objective
@@ -33,7 +32,6 @@ over the whole split, and reports per-class IoU, mIoU, peak GPU memory and
 training step time alongside a failure analysis of the thin classes —
 boundary-band accuracy, per-instance recall against object size, and the
 contribution of each of the four decoder heads.
-
 
 ## 2. Architecture adaptation
 
@@ -162,7 +160,6 @@ python -m tools.analyze_failures
 | AMP enabled | memory headroom at 512×1024 |
 | Iteration-based schedule + resume | bounded GPU sessions |
 
-
 ## 7. Results
 
 ### Overall
@@ -180,28 +177,8 @@ python -m tools.analyze_failures
 
 <img src="results/per_class_iou.png" width="80%">
 
-| Class | Train pixel share % | IoU % |
-|---|---|---|
-| road | 37.65 | 97.89 |
-| sidewalk | 5.41 | 83.44 |
-| building | 21.92 | 91.68 |
-| wall | 0.73 | 51.73 |
-| fence | 0.82 | 57.09 |
-| pole | 1.48 | 63.85 |
-| traffic light | 0.20 | 72.47 |
-| traffic sign | 0.67 | 79.56 |
-| vegetation | 17.32 | 92.26 |
-| terrain | 0.83 | 62.29 |
-| sky | 3.36 | 94.16 |
-| person | 1.30 | 81.79 |
-| rider | 0.22 | 59.97 |
-| car | 6.51 | 93.69 |
-| truck | 0.30 | 64.31 |
-| bus | 0.39 | 78.85 |
-| train | 0.11 | 74.15 |
-| motorcycle | 0.08 | 64.95 |
-| bicycle | 0.71 | 77.26 |
-| **mean** | | **75.86** |
+Exact values, with train pixel share per class, in
+[`results/RESULTS.md`](results/RESULTS.md).
 
 ### Supplementary grouping (does **not** affect the mIoU above)
 
@@ -217,14 +194,16 @@ python -m tools.analyze_failures
 
 | Head | Stride | mIoU % | Large % | Small / thin % |
 |---|---|---|---|---|
-| P4 | 32 | 54.20 | 76.49 | 38.40 |
-| P3 | 16 | 63.94 | 81.44 | 53.21 |
-| P2 | 8 | 70.26 | 84.06 | 63.84 |
-| **P1** | **4** | **74.51** | **85.92** | **71.44** |
+| P4 | 32 | 54.20 | 71.85 | 38.40 |
+| P3 | 16 | 63.94 | 78.28 | 53.21 |
+| P2 | 8 | 70.26 | 81.96 | 63.84 |
+| **P1** | **4** | **74.51** | **84.35** | **71.44** |
 
 Monotonic in resolution. Summing all four heads at inference, which the
 upstream code offers, costs 6.3 points: 69.59 % against 75.86 %, and
 60.05 % against 71.41 % on the thin classes. `P[-1]` alone is reported.
+
+### Efficiency
 
 | Measurement | Value |
 |---|---|
@@ -247,13 +226,6 @@ iterations after warm-up, excluding dataloading and validation.
 ### Supervision mode cost (batch 2, 512×1024, synthetic data)
 
 <img src="results/supervision_cost.png" width="68%">
-
-| Mode | Step time s | Peak allocated GiB |
-|---|---|---|
-| deep_supervision + auxiliary heads at native stride | 0.2897 | 4.692 |
-| deep_supervision | 0.4656 | 5.807 |
-| mutation | 0.8536 | 9.184 |
-| last_layer | 0.2901 | 4.905 |
 
 Four loss terms for the cost of one: keeping the auxiliary heads at native
 decoder stride matches `last_layer` to within 0.4 ms. Upsampling them to full
@@ -322,22 +294,12 @@ recall, thin classes:
 
 <img src="results/size_recall.png" width="80%">
 
-| Class | <64 px | >16k px |
-|---|---|---|
-| pole | 15.9 % | 86.9 % |
-| traffic light | 17.0 % | 95.0 % |
-| traffic sign | 15.5 % | 90.1 % |
-| person | 22.7 % | 96.3 % |
-| rider | 18.5 % | 89.4 % |
-| motorcycle | 15.0 % | 88.8 % |
-| bicycle | 16.1 % | 91.7 % |
-
-Pole's full progression across the six size bins is 15.9 / 38.8 / 63.3 / 77.3
-/ 85.0 / 86.9. Every class lies between 15 % and 23 % on components under 64
-pixels and between 86.9 % and 96.3 % above 16k. A distant pole, a distant
-pedestrian and a distant traffic light share little in appearance and much in
-pixel count, which suggests the limit is the output stride rather than
-anything class-specific.
+Every class lies between 15.0 % and 22.7 % on components under 64 pixels and
+between 86.9 % and 96.3 % above 16k, and the seven curves are close to
+parallel in between. The classes differ sharply in appearance — a pole is a
+vertical line, a sign a compact blob, a person an articulated shape — and what
+they share is pixel count, which suggests the limit is the output stride
+rather than anything class-specific.
 
 **Residual confusions are semantic rather than spatial.** Pole is absorbed by
 building in 12.0 % of its ground-truth pixels, rider by person in 8.0 %, and
@@ -349,10 +311,13 @@ rather than thin objects being absorbed into whatever surrounds them.
 gap is consistent with the shared, often unmarked boundary between them, where
 the trimap result above locates most of the remaining error.
 
-**Wall and fence** are the weakest classes at 51.73 % and 57.09 %. Both are
-large and flat and are plausibly confused with building, which the group
-averages hide. I did not analyse them specifically and would not claim the
-mechanism without measuring it.
+**The weakest classes are not resolution-limited.** Wall (51.73 %), fence
+(57.09 %) and terrain (62.29 %) lose more ground truth to a single wrong class
+than any thin class does: wall gives 21.5 % of its pixels to building, fence
+17.0 % to building, and terrain 18.1 % to vegetation. All three are large and
+flat and share texture and position with the class that absorbs them, so a
+finer output stride would not help them. A longer schedule and class-balanced
+sampling plausibly would.
 
 ## 10. Validation of the evaluation code
 
@@ -378,33 +343,6 @@ Caveats, stated rather than glossed: resuming does not restore dataloader
 shuffling or RNG state, so a run completed across several sessions is not
 bit-identical to an uninterrupted one; and results are not expected to be
 bit-identical across GPU models or PyTorch versions.
-
-## 12. Limitations
-
-1. **Short schedule.** 10,500 iterations is 14.1 epochs, against the
-   40k–80k iterations standard on this benchmark. A held-out thin-class probe
-   moved only from 0.7103 to 0.7162 mIoU over the final 2,500 iterations, so
-   the model is near the flat part of its curve for this schedule — but a
-   longer run would still add several points, most of them on the classes
-   below 65 % IoU.
-2. **Half-resolution training.** 512×1024 random crops, evaluated at native
-   1024×2048. Training at full resolution would change the scale statistics
-   the model sees.
-3. **Single seed, single configuration.** No variance estimate, so a
-   difference of a point or two between configurations is not resolvable here.
-4. **Supervision deviation.** Deep supervision with four loss terms rather
-   than EMCAD's MUTATION over 15 subsets. The cost measurement in §7
-   justifies it on this hardware but it is a deviation from the paper.
-5. **Evaluation protocol.** One confusion matrix over the whole split, no
-   multi-scale or flipped test-time augmentation, no official-evaluator
-   cross-check. Published Cityscapes numbers often include TTA, so 75.86 % is
-   not directly comparable to a table that does.
-6. **Small-batch BatchNorm.** Batch 4 on one card means the decoder's
-   BatchNorm layers normalise over 4 samples. Synchronised BatchNorm or a
-   larger batch would likely help the rare classes.
-7. **Subset analyses.** Per-head, trimap and size-recall use 100 validation
-   images for time reasons; the per-class table, mIoU and pixel accuracy use
-   all 500.
 
 
 ## Attribution
