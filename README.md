@@ -318,7 +318,7 @@ than any thin class does: wall gives 21.5 % of its pixels to building, fence
 flat and share texture and position with the class that absorbs them, so a
 finer output stride would not help them. A longer schedule and class-balanced
 sampling plausibly would.
-
+<!-- 
 ## 10. Validation of the evaluation code
 
 - `tests/test_metrics.py` — 8 unit tests (perfect, all-wrong, two-class swap,
@@ -331,9 +331,19 @@ sampling plausibly would.
   is in place but the official `cityscapesScripts` evaluator needs the
   `labelTrainIds` ground truth written to disk and a separate pass over the
   split. The metric here is validated instead by the eight unit tests above, including a hand-computed case and
-  exact 1.000000 mIoU on ground truth.
+  exact 1.000000 mIoU on ground truth. -->
 
-## 11. Reproducibility
+## 10. Correctness and Reproducibility
+
+The reported mIoU was not cross-checked against the official
+`cityscapesScripts` evaluator — it needs `labelTrainIds` written to disk and a
+separate pass over the split. `tools/official_eval_crosscheck.py` is in place
+for it. In its absence the metric is validated directly: `tests/test_metrics.py`
+covers eight cases including a hand-computed confusion matrix, an all-ignore
+batch, and absent classes, and returns exactly 1.000000 mIoU on ground truth.
+`tests/test_losses.py` demonstrates numerically that upstream's `DiceLoss`
+responds to logits inside the ignore region while the masked version here does
+not — the bug described in §2, shown rather than asserted.
 
 Seeds fixed for `random`, `numpy`, `torch`, CUDA and dataloader workers;
 `cudnn.deterministic=True`; configuration dumped to `runs/<exp>/config.json`
